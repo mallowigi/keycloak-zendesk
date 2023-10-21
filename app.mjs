@@ -13,13 +13,36 @@ app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 
 const kcClientId = 'zendesk';
+const kcEuClientId = 'zendesk-eu';
+
 const kcClientSecret = 'ln0dKh9wQEVjIdHwWuBm6Y8JReVnktpI';
+const kcEuClientSecret = '7R264wgmdlmiOLg71VYR6QRVO9V1h73K';
+
 const zendeskSSOSecret = 'MdyJAitop4n3LbyySzybqCY8FtZARkKvkKocw8mOR6iobMRy';
 const callbackUrl = 'http://localhost:3000/callback';
 const keycloakUrl = 'http://localhost:8080/realms/admin/protocol/openid-connect';
 const zendeskJwtUrl = 'https://d3v-klarthcorp.zendesk.com/access/jwt';
 
 app.get('/login', (req, res) => {
+  const returnTo = req.query.return_to ?? '';
+  let clientId, clientSecret;
+
+  // TODO: Define whether to check to EU or US. In the final script we will have different urls in addition to different clients
+  switch (true) {
+    case returnTo.includes('d3v-klarthcorp-us'):
+      clientId = kcClientId;
+      clientSecret = kcClientSecret;
+      break;
+    case returnTo.includes('d3v-klarthcorp-eu'):
+      clientId = kcEuClientId;
+      clientSecret = kcEuClientSecret;
+      break;
+    default:
+      clientId = kcClientId;
+      clientSecret = kcClientSecret;
+  }
+
+
   // Login to keycloak
   const keycloakAuthUrl = `${keycloakUrl}/auth?response_type=code&client_id=${encodeURIComponent(kcClientId)}&redirect_uri=${encodeURIComponent(callbackUrl)}`;
   res.redirect(keycloakAuthUrl);
@@ -39,18 +62,7 @@ app.get('/callback', async (req, res) => {
   const tokenData = await tokenResponse.json();
   const decodedJwt = jwt2.decode(tokenData.access_token);
   const encodedToken = jwt.encode(decodedJwt, zendeskSSOSecret);
-  // const serverResponse = await fetch(serverUrl, {
-  //   method: 'POST',
-  //   headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-  //   body: `jwt=${base64token}`
-  // });
-
-  // Checking server's response
-  // if (serverResponse.ok) {
-    res.redirect(`${zendeskJwtUrl}?jwt=${encodedToken}`);
-  // } else {
-  //   res.status(400).send('An error occurred');
-  // }
+  res.redirect(`${zendeskJwtUrl}?jwt=${encodedToken}`);
 });
 
 export default app;
