@@ -15,10 +15,10 @@ app.use(cookieParser());
 const kcClientId = 'zendesk';
 const kcEuClientId = 'zendesk-eu';
 
-const kcClientSecret = 'ln0dKh9wQEVjIdHwWuBm6Y8JReVnktpI';
-const kcEuClientSecret = '7R264wgmdlmiOLg71VYR6QRVO9V1h73K';
+const kcClientSecret = '';
+const kcEuClientSecret = '';
 
-const zendeskSSOSecret = 'MdyJAitop4n3LbyySzybqCY8FtZARkKvkKocw8mOR6iobMRy';
+const zendeskSSOSecret = '';
 const callbackUrl = 'http://localhost:3000/callback';
 const keycloakUrl = 'http://localhost:8080/realms/admin/protocol/openid-connect';
 const zendeskJwtUrl = 'https://d3v-klarthcorp.zendesk.com/access/jwt';
